@@ -45,8 +45,6 @@ class Hero():
             if item_used in self.items and self.items[item_used] != 0:
                 while self.items[item_used] > 0 and count == 0:                             
                     if item_used == 'healing potion':
-                        if full_health > self.health+20:
-                            self.health = full_health 
                         self.health += 20
                         self.items['healing potion'] -= 1
                         print("+20 health, Total Hero health: {}".format(self.health))
@@ -135,53 +133,64 @@ print("*Battle music starts to play*")
 
 
 # Loop or series of statements in order to battle enemies 
-def battle(hero, enemy):
-    while True: # this while keeps from any wrong input from going into the next loop
-        action_list = ['attack', 'use item', 'standby']
+def battle(hero, enemy): # function was fixed using chat gpt
+    action_list = ['attack', 'use item', 'standby']
+    while hero.health >= 0  or enemy.health >= 0: #battle will stop after one of the parties health is below or technically at 0
         print("Type an action you would like to take: attack, use item, standby")
-        action = input() 
-        if action in action_list and all(value > 0 for value in hero.items.values()):
-            while hero.health >= 0  or enemy.health >= 0: #battle will stop after one of the parties health is below or technically at 0
-                if hero.health <= 0:
-                    hero.health = 0
-                    hero.dies()
-                    
-                if action == 'attack':      
-                    hero.attacks(enemy)
-                    if enemy.health <= 0:
-                        enemy.health = 0
-                        print(enemy)
-                        enemy.dies()
-                        return print("Victory")
-                    print(enemy)
-                    enemy.attacks(hero)
-                    print("Health: {}".format(hero.health))
-                    print("-----------")  
-                    break
+        action = input().strip().lower()
 
-                if action == 'use item':
-                    hero.use_item()
-                    enemy.attacks(hero)
-                    print("Health: {}".format(hero.health))
-                    print("-----------")  
-                    break
-
-                if action == 'standby':
-                    hero.standby()
-                    enemy.attacks(hero)
-                    print("Health: {}".format(hero.health))
-                    print("-----------")  
-                    break  
-
-        elif action in action_list and action == 'use item' and all(value == 0 for value in hero.items.values()):
-            print("-------------------------------")
-            print("You have no items you can use!")
-            print("-------------------------------")
-                        
-        else:
+        if action not in action_list:
             print("-------------------------------")
             print("please type an action listed")
             print("-------------------------------")
+            continue
+
+        if action == 'attack':     
+            hero.attacks(enemy)
+            if enemy.health <= 0:
+                enemy.health = 0
+                print(enemy)
+                enemy.dies()        #enemy can only die on turn when hero is attacking anyways this keeps the code from running another turn and the enemy dying on that turn
+                print ("Victory")
+                return
+            
+            print(enemy)
+            enemy.attacks(hero)
+            if hero.health <= 0:
+                hero.health = 0
+                hero.dies()
+                print("Defeat")
+                return
+
+        elif action == 'use item':
+            if any(value > 0 for value in hero.items.values()): #if there is no items available breaks out of the loop
+                hero.use_item()
+                enemy.attacks(hero)
+                if hero.health <= 0:
+                    hero.health = 0
+                    hero.dies()
+                    print("Defeat")
+                    return
+            
+                print("Health: {}".format(hero.health))
+                print("-----------")  
+            
+            else:
+                print("No items available to use")
+
+        elif action == 'standby':
+            hero.standby()
+            enemy.attacks(hero)
+            if hero.health <= 0:
+                    hero.health = 0
+                    hero.dies()
+                    print("Defeat")
+                    return
+            print("Health: {}".format(hero.health))
+            print("-----------")  
+            
+
+# main reason for using chatgpt was to fix the use item function           
                 
 
 battle(hero1, narrator)
