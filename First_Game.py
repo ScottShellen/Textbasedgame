@@ -2,6 +2,7 @@
 import time
 import random
 
+
 class Hero():
     def __init__(self, name, level=1, health=100, strength=10, items = {'healing potion': 2}):
         self.name = name 
@@ -100,7 +101,7 @@ class Enemy():
             hero.health = hero.health - int(attack_damage)
         return hero.health 
     
-    def escapes(self):
+    def escapes(self): # enemy attempts an escape 
         chance_of_running = random.randint(1, 100)
         if chance_of_running % 5:
             print("{} has escaped".format(self.name))
@@ -110,8 +111,10 @@ class Enemy():
     def dies(self):
         if self.health <= 0:
             print("you got me you son of a bitch")
+            
         
-
+class NPC():
+    pass
 
 #Introduction to the game setting
 print('Enter you name, Hero:')
@@ -119,8 +122,7 @@ x = input()
 hero1 = Hero(x,)
 print(hero1)
 narrator = Enemy('narrator',)
-Demon_lord = Enemy('Demon Lord', 100, 50000, 500, {"Devil's Wrath": 1})
-Guts = Hero('Guts', 100, 20000, 450, )
+
 print(x + ", huh, well that's a dumb name")
 #time.sleep(3)
 print("...")
@@ -131,38 +133,54 @@ print("*Battle music starts to play*")
 
 # Loop or series of statements in order to battle enemies 
 def battle(hero, enemy):
-    while hero.health >= 0  or enemy.health >= 0:
-        if hero.health <= 0:
-            hero.health = 0
-            hero.dies()
-            break
-        if enemy.health <= 0:
-            enemy.health = 0
-            enemy.dies()
-            break
+    while True: # this while keeps from any wrong input from going into the next loop
+        action_list = ['attack', 'use item', 'standby']
         print("Type an action you would like to take: attack, use item, standby")
-        y= input()
-         
-        if y == 'attack' and enemy.health > 0:      
-            hero.attacks(enemy)
-            print(enemy)
-        if y == 'use item':
-            hero.use_item()
-        if y == 'standby':
-            hero.standby()
-        
-        
-        enemy.attacks(hero)
-        if enemy.health <= enemy.health *.25:
-            enemy.escapes()
-            break
+        action = input() 
+        if action in action_list:
+            while hero.health >= 0  or enemy.health >= 0: #battle will stop after one of the parties health is below or technically at 0
+                if hero.health <= 0:
+                    hero.health = 0
+                    hero.dies()
+                    
+                if action == 'attack':      
+                    hero.attacks(enemy)
+                    if enemy.health <= 0:
+                        enemy.health = 0
+                        print(enemy)
+                        enemy.dies()
+                        return
+                    print(enemy)
+                    enemy.attacks(hero)
+                    print("Health: {}".format(hero.health))
+                    print("____________________")  
+                    break
 
-        print("Health: {}".format(hero.health))
-        print("____________________")    
+                if action == 'use item':
+                    hero.use_item()
+                    enemy.attacks(hero)
+                    print("Health: {}".format(hero.health))
+                    print("____________________")  
+                    break
+
+                if action == 'standby':
+                    hero.standby()
+                    enemy.attacks(hero)
+                    print("Health: {}".format(hero.health))
+                    print("____________________")  
+                    break
+
+                print("Health: {}".format(hero.health))
+                print("____________________")    
+        else:
+            print("-------------------------------")
+            print("please type an action listed")
+            print("-------------------------------")
+                
 
 battle(hero1, narrator)
 
-print("The Final Battle Commences")    
-battle(Guts, Demon_lord)
+
+
 
 
