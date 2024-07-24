@@ -38,23 +38,26 @@ class Hero():
         #if the input is wrong it will ask again until valid input is used
     def use_item(self):
         count = 0
+        full_health = self.health 
         while True:
             print("Choose one of your items {}".format(self.items))
             item_used = input()
-            if item_used in self.items:
-                while self.items[item_used] >= 0 and count == 0:
-                    if self.items[item_used] == 0:
-                        print("There are no more {}".format(item_used)) 
-                        print("------------------------------")
-                        break                  
-                    elif item_used == 'healing potion':
+            if item_used in self.items and self.items[item_used] != 0:
+                while self.items[item_used] > 0 and count == 0:                             
+                    if item_used == 'healing potion':
+                        if full_health > self.health+20:
+                            self.health = full_health 
                         self.health += 20
                         self.items['healing potion'] -= 1
                         print("+20 health, Total Hero health: {}".format(self.health))
                         count += 1
                         continue                                       
                 break
-            
+
+            elif item_used in self.items and self.items[item_used] == 0:
+                    print("There are no more {}s".format(item_used)) 
+                    print("------------------------------")
+                    
             else:
                 print("please type an item in your inventory")
                 print("{}".format(self.items))
@@ -137,7 +140,7 @@ def battle(hero, enemy):
         action_list = ['attack', 'use item', 'standby']
         print("Type an action you would like to take: attack, use item, standby")
         action = input() 
-        if action in action_list:
+        if action in action_list and all(value > 0 for value in hero.items.values()):
             while hero.health >= 0  or enemy.health >= 0: #battle will stop after one of the parties health is below or technically at 0
                 if hero.health <= 0:
                     hero.health = 0
@@ -149,29 +152,32 @@ def battle(hero, enemy):
                         enemy.health = 0
                         print(enemy)
                         enemy.dies()
-                        return
+                        return print("Victory")
                     print(enemy)
                     enemy.attacks(hero)
                     print("Health: {}".format(hero.health))
-                    print("____________________")  
+                    print("-----------")  
                     break
 
                 if action == 'use item':
                     hero.use_item()
                     enemy.attacks(hero)
                     print("Health: {}".format(hero.health))
-                    print("____________________")  
+                    print("-----------")  
                     break
 
                 if action == 'standby':
                     hero.standby()
                     enemy.attacks(hero)
                     print("Health: {}".format(hero.health))
-                    print("____________________")  
-                    break
+                    print("-----------")  
+                    break  
 
-                print("Health: {}".format(hero.health))
-                print("____________________")    
+        elif action in action_list and action == 'use item' and all(value == 0 for value in hero.items.values()):
+            print("-------------------------------")
+            print("You have no items you can use!")
+            print("-------------------------------")
+                        
         else:
             print("-------------------------------")
             print("please type an action listed")
