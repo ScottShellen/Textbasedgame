@@ -4,10 +4,11 @@ import random
 
 
 class Hero():
-    def __init__(self, name, level=1, health=100, strength=10, items = {'healing potion': 2}):
+    def __init__(self, name, level=1, max_health= 100, health=100, strength=10, items = {'healing potion': 2}):
         self.name = name 
         self.level = level
-        self.health = health
+        self.max_health = max_health # max_health and health are needed in order to impose correct healing potion logic
+        self.health = health # health as one variable can not contain two different values of a maximum and current placeholder
         self.strength = strength
         self.items = items
 
@@ -36,23 +37,27 @@ class Hero():
 
         # goal of the function below is to use a healing potion, if there are no more healing potions then it will return to battle action
         #if the input is wrong it will ask again until valid input is used
+        
     def use_item(self):
-        count = 0
-        full_health = self.health 
+        count = 0 
         while True:
+            print("----------------------------------")
             print("Choose one of your items {}".format(self.items))
-            item_used = input()
-            if item_used in self.items and self.items[item_used] != 0:
-                while self.items[item_used] > 0 and count == 0:                             
-                    if item_used == 'healing potion':
-                        self.health += 20
-                        self.items['healing potion'] -= 1
-                        print("+20 health, Total Hero health: {}".format(self.health))
-                        count += 1
-                        continue                                       
-                break
+            item_used = input().strip().lower()
+            if item_used in self.items: # the multiple if statements allow for more readable code in this case 
+                if self.items[item_used] > 0:
+                    if item_used == 'healing potion':#chat gpt used to fix healing potion logic 
+                        if self.health == self.max_health: # if hero health is at max the health potion does not increase the hero's health beyond max health it just returns it to the max_health
+                            print("Your health is already at max health")
+                        else:
+                            healed_amount = min(20, self.max_health - self.health) # calculates heal amount
+                            self.health += healed_amount                    
+                            self.items['healing potion'] -= 1
+                            print("+{} health, Total Hero health: {}".format(healed_amount, self.health))
+                        break                                       
+                    # space to define more items may be useful to create a separate file for items if project get larger
 
-            elif item_used in self.items and self.items[item_used] == 0:
+                else:
                     print("There are no more {}s".format(item_used)) 
                     print("------------------------------")
                     
@@ -72,7 +77,7 @@ class Hero():
 
     
 
-class Enemy():
+class Enemy(): #
     def __init__(self, name, level = 1, health = 50, strength = 20, items = None):
         self.name = name 
         self.level = level
@@ -115,6 +120,7 @@ class Enemy():
             
         
 class NPC():
+    
     pass
 
 #Introduction to the game setting
