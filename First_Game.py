@@ -36,24 +36,32 @@ class Hero():
         if enemy.health <= 0:
             attack = False
 
-        # goal of the function below is to use a healing potion, if there are no more healing potions then it will return to battle action
-        #if the input is wrong it will ask again until valid input is used
     def buy_item(self, npc):
         while True:
             print('----------------------------------')
+            print(npc.items)
+            print('----------------------------------')
             item_bought = input().strip().lower()
             if item_bought in npc.items:
-                if self.money >= item_bought.value():
+                if self.money >= npc.items[item_bought]:
                     if item_bought in self.items:
-                        self.items[item_bought] += 1
-                        print("You have bought ")
+                        self.items[item_bought] += 1     
                     else:
                         self.items.update({item_bought: 1})
-                    break
-                elif npc.items.value() <= self.money:
-                    print("You don't have enough money to buy this item")
-            
+                    
+                    print("\nYou have bought a {}".format(item_bought))
+                    self.money -= npc.items[item_bought]
 
+                    cont_shop = input("Would you like to buy anything else: Y/N\n").strip().upper()
+
+                    if cont_shop != 'Y':
+                        break
+                else:
+                    print("\nYou don't have enough money to buy this item")
+            else:
+                print("\nThis item is not available")
+            
+# next time for items I would create a class on their own 
     def use_item(self):
         while True:
             print("----------------------------------")
@@ -68,10 +76,21 @@ class Hero():
                             healed_amount = min(20, self.max_health - self.health) # calculates heal amount
                             self.health += healed_amount                    
                             self.items['healing potion'] -= 1
-                            print("+{} health, Total Hero health: {}".format(healed_amount, self.health))
+                            print("+{} health\n Total Hero health: {}".format(healed_amount, self.health))
                         break                                       
                     # space to define more items may be useful to create a separate file for items if project get larger
-
+                    elif item_used == 'strength potion':
+                        print("Your strength surges within you")
+                        self.strength += 5
+                        self.items['strength potion'] -= 1
+                        print("+{} strength\n Total Hero strength: {}".format(str(5), self.strength))#for this purpose I will leave strength larger after each use and not go down after battle
+                        break
+                    elif item_used == 'max health potion':
+                        print("Your Life force surges")
+                        self.max_health += 20
+                        self.items['max health potion'] -= 1
+                        print("+{} total health\n Total Max Hero Health: {}".format(str(20), self.max_health))
+                        break
                 else:
                     print("There are no more {}s".format(item_used)) 
                     print("------------------------------")
@@ -131,29 +150,23 @@ class Enemy(): #
 
     def dies(self):
         if self.health <= 0:
-            print("you got me you son of a bitch")
+            print("you got me...")
             
-        
+    # for the item dictionary of the npc the items are going to be associated with value not inevntory
 class NPC():
-    def __init__(self, name, dialogue, items = {}, money = 50):
+    def __init__(self, name, items = {'healing potion': 30, 'strength potion': 30, 'max health potion': 100}, money = 50):
         self.name = name
-        self.dialogue = dialogue
         self.items = items
         self.money = money
 
-    def sell_items(self):
-        print("Here are my wares: "+{}.format(self.items))
-        
-
-
-    
 
 # Loop or series of statements in order to battle enemies 
 def battle(hero, enemy): # function was fixed using chat gpt
     action_list = ['attack', 'use item', 'standby']
+    slowprint("...BATTLE MODE...")
     while hero.health >= 0  or enemy.health >= 0: #battle will stop after one of the parties health is below or technically at 0
         print("Type an action you would like to take: attack, use item, standby")
-        action = input().strip().lower(),
+        action = input().strip().lower()
 
         if action not in action_list:
             print("-------------------------------")
@@ -215,69 +228,82 @@ def slowprint(text):
 
 
 # Chatgpt was mainly used to fix function of items in the system as they are now more robust and can handle edge cases better         
-#       
+
+# without a doubt def need less slowprints it hampers the readability of the code 
+
 # Beginning of the game
 slowprint('*Your name*:')
 name = input()
-slowprint("Awaken"+ name +", there is no time left, they've come for us.")
-slowprint("They are burning the village to the ground")
-slowprint("...")
-slowprint("What?")
+slowprint("\nAwaken "+ name +", there is no time left, they've come for us.")
+slowprint('''They are burning the village to the ground\n
+...\n
+What?''')
 
-slowprint("Listen boy they are leaving nothing in their wake")
-slowprint("*Old man Gobert spits blood on your chest*")
+hero = Hero(name,) #class instance of hero
+
+soldier = Enemy('Soldier',) # class instance of enemy
+
+sus_grandma = NPC('Sus Grandma') #class instance of npc
+#these ccould be done withe super and sub classes  b ut just learned about those
+
+slowprint('''Listen boy they are leaving nothing in their wake\n 
+*Old man Gobert spits blood on your chest*''')
+
 time.sleep(1)
-slowprint("THERE IS NO TIME FOR THIS YOU MUST RUN!!!")
-slowprint("*Gobert collapses revealing an arrow lodged into his lung*")
-slowprint("...")
+
+slowprint('''THERE IS NO TIME FOR THIS YOU MUST RUN!!!\n
+*Gobert collapses revealing an arrow lodged into his lung*\n
+...''')
+
 time.sleep(3)
 
-slowprint("*Stay or Run*")
-
+slowprint("\n*Stay or Run*")
 
 while True:
     choice1 = input().strip().lower()
     if choice1 == "run":
-        slowprint("*You run away from the burning village*")
+        slowprint("\n*You run away from the burning village*")
         break
     else:
         slowprint("You cannot stay here!")
 
-slowprint("*You enter the forest there is a fork on the path: left or right")
+slowprint("\n*You enter the forest there is a fork on the path: left or right")
+
 while True:
     choice2 = input().strip().lower()
     if choice2 == 'left':
-        slowprint("There's another fork in the road, left seems to be bathed in darkness and right is illuminated by what looks like a campfire...")
+        slowprint("\nThere's another fork in the road, left seems to be bathed in darkness and right is illuminated by what looks like a campfire...")
         choice2_1 = input().strip().lower()
         if choice2_1 == 'left':
-            slowprint("There's nothing here, turn back around.")
+            slowprint("\nThere's nothing here, you head back to the first fork.")
         elif choice2_1 == 'right':
-            slowprint("An old woman is sitting near a fire")
-            slowprint("*She looks at you*")
-            slowprint("It is dangerous here young one, would you like to purchase some wares before you head back")
-        else:
-            slowprint("Please choose one of the directions")
+            slowprint('''\nAn old woman is sitting near a fire\n
+*She looks at you*\n
+It is dangerous here young one, would you like to purchase some wares before you head back''')
+            
+            hero.buy_item(sus_grandma)
+            
+            slowprint("You have nothing left to do here you turn back to the first fork in the road")
             
     if choice2 == 'right':
-        slowprint("You head through and come to another fork in the road")
+        slowprint('''\n*You walk along the path and hear someone*\n
+*A soldier is sitting there, he looks like he has been separated from the main troop*\n
+*He spots you from far away*\n
+Who are you, what are you doing out here?\n
+WHAT! A villager! Well, they said none left alive. Sorry, young one...''')
+
+        battle(hero, soldier)
+
+        slowprint('''I didn't think it would end like this... how pathetic...\nKnow this young one...\n
+They will hunt you down to the...\n
+*You look at the dead soldier, taking in the moment*''')
+        
+        time.sleep(2)
+
+        slowprint('''*You run into the forest, deep, knowing whatever future lay ahead may be bleak...\n
+                ...THE END...''')
+        exit()
     else:
         slowprint("Please choose one of the directions")
 
-hero1 = Hero(name,)
-print(hero1)
-narrator = Enemy('narrator',)
-
-
-
-#slowprint(name + ", huh, well that's a dumb name")
-#time.sleep(1)
-#print("...")
-#time.sleep(1)
-#print("*The narrator attacks*")
-#print("*Battle music starts to play*")
-#battle(hero1, narrator)
-
-
-
-
-
+#almost done finish the rest tomorrow
