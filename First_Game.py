@@ -1,20 +1,21 @@
 #Game
 import time
 import random
-
+import sys
 
 class Hero():
-    def __init__(self, name, level=1, max_health= 100, health=100, strength=10, items = {'healing potion': 2}):
+    def __init__(self, name, level=1, max_health= 100, health=100, strength=10, items = {'healing potion': 2}, money = 100):
         self.name = name 
         self.level = level
         self.max_health = max_health # max_health and health are needed in order to impose correct healing potion logic
         self.health = health # health as one variable can not contain two different values of a maximum and current placeholder
         self.strength = strength
         self.items = items
+        self.money = money
 
     def __repr__(self):
        return "Your Hero's name is {}, you are level {}, you have {} health, and your attack strength is {}".format(self.name, self.level, self.health, self.strength)
-
+    
     def attacks(self, enemy):
         attack = True
         attack_damage = self.strength * (1 - (random.randint(-1,1)/4))
@@ -37,9 +38,23 @@ class Hero():
 
         # goal of the function below is to use a healing potion, if there are no more healing potions then it will return to battle action
         #if the input is wrong it will ask again until valid input is used
-        
+    def buy_item(self, npc):
+        while True:
+            print('----------------------------------')
+            item_bought = input().strip().lower()
+            if item_bought in npc.items:
+                if self.money >= item_bought.value():
+                    if item_bought in self.items:
+                        self.items[item_bought] += 1
+                        print("You have bought ")
+                    else:
+                        self.items.update({item_bought: 1})
+                    break
+                elif npc.items.value() <= self.money:
+                    print("You don't have enough money to buy this item")
+            
+
     def use_item(self):
-        count = 0 
         while True:
             print("----------------------------------")
             print("Choose one of your items {}".format(self.items))
@@ -120,30 +135,25 @@ class Enemy(): #
             
         
 class NPC():
+    def __init__(self, name, dialogue, items = {}, money = 50):
+        self.name = name
+        self.dialogue = dialogue
+        self.items = items
+        self.money = money
+
+    def sell_items(self):
+        print("Here are my wares: "+{}.format(self.items))
+        
+
+
     
-    pass
-
-#Introduction to the game setting
-print('Enter you name, Hero:')
-x = input()
-hero1 = Hero(x,)
-print(hero1)
-narrator = Enemy('narrator',)
-
-print(x + ", huh, well that's a dumb name")
-#time.sleep(3)
-print("...")
-#time.sleep(3)
-print("*The narrator attacks*")
-print("*Battle music starts to play*")
-
 
 # Loop or series of statements in order to battle enemies 
 def battle(hero, enemy): # function was fixed using chat gpt
     action_list = ['attack', 'use item', 'standby']
     while hero.health >= 0  or enemy.health >= 0: #battle will stop after one of the parties health is below or technically at 0
         print("Type an action you would like to take: attack, use item, standby")
-        action = input().strip().lower()
+        action = input().strip().lower(),
 
         if action not in action_list:
             print("-------------------------------")
@@ -194,12 +204,78 @@ def battle(hero, enemy): # function was fixed using chat gpt
                     return
             print("Health: {}".format(hero.health))
             print("-----------")  
+
+
+def slowprint(text):
+    for word in text:
+        sys.stdout.write(word)
+        sys.stdout.flush()
+        time.sleep(.05)
+    print("\n")
+
+
+# Chatgpt was mainly used to fix function of items in the system as they are now more robust and can handle edge cases better         
+#       
+# Beginning of the game
+slowprint('*Your name*:')
+name = input()
+slowprint("Awaken"+ name +", there is no time left, they've come for us.")
+slowprint("They are burning the village to the ground")
+slowprint("...")
+slowprint("What?")
+
+slowprint("Listen boy they are leaving nothing in their wake")
+slowprint("*Old man Gobert spits blood on your chest*")
+time.sleep(1)
+slowprint("THERE IS NO TIME FOR THIS YOU MUST RUN!!!")
+slowprint("*Gobert collapses revealing an arrow lodged into his lung*")
+slowprint("...")
+time.sleep(3)
+
+slowprint("*Stay or Run*")
+
+
+while True:
+    choice1 = input().strip().lower()
+    if choice1 == "run":
+        slowprint("*You run away from the burning village*")
+        break
+    else:
+        slowprint("You cannot stay here!")
+
+slowprint("*You enter the forest there is a fork on the path: left or right")
+while True:
+    choice2 = input().strip().lower()
+    if choice2 == 'left':
+        slowprint("There's another fork in the road, left seems to be bathed in darkness and right is illuminated by what looks like a campfire...")
+        choice2_1 = input().strip().lower()
+        if choice2_1 == 'left':
+            slowprint("There's nothing here, turn back around.")
+        elif choice2_1 == 'right':
+            slowprint("An old woman is sitting near a fire")
+            slowprint("*She looks at you*")
+            slowprint("It is dangerous here young one, would you like to purchase some wares before you head back")
+        else:
+            slowprint("Please choose one of the directions")
             
+    if choice2 == 'right':
+        slowprint("You head through and come to another fork in the road")
+    else:
+        slowprint("Please choose one of the directions")
 
-# main reason for using chatgpt was to fix the use item function           
-                
+hero1 = Hero(name,)
+print(hero1)
+narrator = Enemy('narrator',)
 
-battle(hero1, narrator)
+
+
+#slowprint(name + ", huh, well that's a dumb name")
+#time.sleep(1)
+#print("...")
+#time.sleep(1)
+#print("*The narrator attacks*")
+#print("*Battle music starts to play*")
+#battle(hero1, narrator)
 
 
 
